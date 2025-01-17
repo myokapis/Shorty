@@ -24,6 +24,7 @@ namespace Shorty
             builder.Services.AddOpenApi();
             builder.Services.AddSwaggerGen();
             builder.Services.AddScoped<IDataService, DataService>();
+            builder.Services.AddScoped<IEncodingService, EncodingService>();
             builder.Services.AddScoped<IUrlService, UrlService>();
             builder.Services.AddScoped((service) => KeyProvider(service));
             builder.Services.AddSingleton(dataStore);

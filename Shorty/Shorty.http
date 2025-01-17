@@ -1,6 +1,25 @@
 @Shorty_HostAddress = http://localhost:5016
 
-GET {{Shorty_HostAddress}}/weatherforecast/
-Accept: application/json
+POST {{Shorty_HostAddress}}/Url/ShortenUrl
+Content-Type: application/json
+"https://ferrets.com/toys/puzzles?item=Akr45"
+
+###
+
+POST {{Shorty_HostAddress}}/Url/ShortenUrl
+Content-Type: application/json
+"bad.url.com"
+
+###
+
+POST {{Shorty_HostAddress}}/Url/ExpandUrl
+Content-Type: application/json
+"https://shorty.com/G3KUATicBXurP2Pj"
+
+###
+
+POST {{Shorty_HostAddress}}/Url/ExpandUrl
+Content-Type: application/json
+"https://shorty.com/UNKNOWN"
 
 ###

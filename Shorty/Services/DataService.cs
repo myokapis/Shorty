@@ -1,5 +1,4 @@
-﻿using LiteDB;
-using LiteDB.Async;
+﻿using LiteDB.Async;
 using Shorty.Models;
 
 namespace Shorty.Services
