@@ -16,7 +16,7 @@ namespace Shorty.Tests.Services
         [Fact]
         public async Task TestExpandUrl_BadUrl()
         {
-            var testService = new UrlService(MockConfig(), MockDataService().Object, MockKeyProvider());
+            var testService = new UrlService(MockConfig(), MockDataService().Object, MockEncodingService());
             await Assert.ThrowsAsync<InvalidUrlException>(async () => await testService.ExpandUrl(badUrl));
         }
 
@@ -25,7 +25,7 @@ namespace Shorty.Tests.Services
         {
             var shortUrl = String.Concat(baseUrl, tag);
             var mockDataService = MockDataService(null, GetUrlDocument(goodFullUrl, tag));
-            var testService = new UrlService(MockConfig(), mockDataService.Object, MockKeyProvider());
+            var testService = new UrlService(MockConfig(), mockDataService.Object, MockEncodingService());
             var result = await testService.ExpandUrl(shortUrl);
 
             result.Should().Be(goodFullUrl);
@@ -35,7 +35,7 @@ namespace Shorty.Tests.Services
         public async Task TestExpandUrl_UnknownUrl()
         {
             var unknownUrl = String.Concat(baseUrl, "bogus_tag");
-            var testService = new UrlService(MockConfig(), MockDataService().Object, MockKeyProvider());
+            var testService = new UrlService(MockConfig(), MockDataService().Object, MockEncodingService());
             await Assert.ThrowsAsync<UnknownUrlException>(async () => await testService.ExpandUrl(unknownUrl));
         }
 
@@ -46,7 +46,7 @@ namespace Shorty.Tests.Services
         [Fact]
         public async Task TestShortenUrl_BadUrl()
         {
-            var testService = new UrlService(MockConfig(), MockDataService().Object, MockKeyProvider());
+            var testService = new UrlService(MockConfig(), MockDataService().Object, MockEncodingService());
             await Assert.ThrowsAsync<InvalidUrlException>(async () => await testService.ShortenUrl(badUrl));
         }
 
@@ -56,7 +56,7 @@ namespace Shorty.Tests.Services
             var expectedUrl = String.Concat(baseUrl, tag);
             var saveValue = GetUrlDocument(goodFullUrl, tag);
             var mockDataService = MockDataService(null, null, saveValue);
-            var testService = new UrlService(MockConfig(), mockDataService.Object, MockKeyProvider());
+            var testService = new UrlService(MockConfig(), mockDataService.Object, MockEncodingService());
             var result = await testService.ShortenUrl(goodFullUrl);
 
             result.Should().Be(expectedUrl);
@@ -69,7 +69,7 @@ namespace Shorty.Tests.Services
             var expectedUrl = String.Concat(baseUrl, tag);
             var findResult = GetUrlDocument(goodFullUrl, tag);
             var mockDataService = MockDataService(findResult);
-            var testService = new UrlService(MockConfig(), mockDataService.Object, MockKeyProvider());
+            var testService = new UrlService(MockConfig(), mockDataService.Object, MockEncodingService());
             var result = await testService.ShortenUrl(goodFullUrl);
 
             result.Should().Be(expectedUrl);
@@ -97,9 +97,11 @@ namespace Shorty.Tests.Services
             return mock;
         }
 
-        private static Func<byte[]> MockKeyProvider(byte[]? result = null)
+        private static IEncodingService MockEncodingService()
         {
-            return new Func<byte[]>(() => result ?? key);
+            var mock = new Mock<IEncodingService>();
+            mock.Setup(m => m.CreateUrlTag()).Returns(tag);
+            return mock.Object;
         }
 
         private static UrlDocument GetUrlDocument(string fullUrl, string tag)

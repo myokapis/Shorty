@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using Shorty.Configs;
 using Shorty.Exceptions;
 using Shorty.Models;
@@ -10,13 +9,13 @@ namespace Shorty.Services
     {
         private readonly EncoderConfig config;
         private readonly IDataService dataService;
-        private readonly Func<byte[]> keyProvider;
+        private readonly IEncodingService encodingService;
 
-        public UrlService(IOptions<EncoderConfig> config, IDataService dataService, Func<byte[]> keyProvider)
+        public UrlService(IOptions<EncoderConfig> config, IDataService dataService, IEncodingService encodingService)
         {
             this.config = config.Value;
             this.dataService = dataService;
-            this.keyProvider = keyProvider;
+            this.encodingService = encodingService;
         }
 
         public async Task<string> ExpandUrl(string shortUrl)
@@ -70,19 +69,11 @@ namespace Shorty.Services
             var url = new UrlDocument()
             {
                 FullUrl = uri.ToString(),
-                Tag = CreateUrlTag()
+                Tag = encodingService.CreateUrlTag()
             };
 
             await dataService.SaveUrl(url);
             return url;
-        }
-
-        public string CreateUrlTag()
-        {
-            // NOTE: Documentation is unclear whether the encode overload that accepts a byte array
-            //       suppresses padding and substitutes URL-friendly characters for / and +.
-            //       Playing with some data looks like it does.
-            return Base64UrlEncoder.Encode(keyProvider());
         }
     }
 }
